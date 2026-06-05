@@ -138,9 +138,9 @@ std::wstring ConfigurationGUI::BrowseForFile() {
 	OPENFILENAME ofn;
 	wchar_t szFile[MAX_PATH] = { 0 };
 
-	// Search existing Farming Simulator installation from 25 down to 13 in default directory and use the highest found version as default
+	// Search existing Farming Simulator installation from 29 down to 13 in default directory and use the highest found version as default
 	std::wstring initialDir;
-	for (int ver = 25; ver >= 13; --ver) {
+	for (int ver = 29; ver >= 13; --ver) {
 		std::wstring candidate = L"C:\\Program Files\\Farming Simulator " + std::to_wstring(ver) + L"\\x64\\FarmingSimulator" + std::to_wstring(ver) + L"Game.exe";
 		if (GetFileAttributesW(candidate.c_str()) != INVALID_FILE_ATTRIBUTES) {
 			wcscpy_s(szFile, candidate.c_str());
