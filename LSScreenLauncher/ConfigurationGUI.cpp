@@ -12,6 +12,7 @@ HWND ConfigurationGUI::hCreateShortcutBtn = nullptr;
 HWND ConfigurationGUI::hBrowseBtn = nullptr;
 HWND ConfigurationGUI::hRefreshMonitorIDBtn = nullptr;
 HWND ConfigurationGUI::hUseOriginalIconCheckbox = nullptr;
+HWND ConfigurationGUI::hStartMinimizedCheckbox = nullptr;
 std::wstring ConfigurationGUI::g_exePath = L"";
 std::map<std::wstring, HFONT> ConfigurationGUI::g_fonts;
 
@@ -70,7 +71,7 @@ void ConfigurationGUI::CleanupFonts() {
 	g_fonts.clear();
 }
 
-bool ConfigurationGUI::CreateDesktopShortcut(const std::wstring& exePath, int monitorID, bool useOriginalIcon) {
+bool ConfigurationGUI::CreateDesktopShortcut(const std::wstring& exePath, int monitorID, bool useOriginalIcon, bool startMinimized) {
 	// Get desktop path
 	wchar_t desktopPath[MAX_PATH];
 	if (FAILED(SHGetFolderPath(nullptr, CSIDL_DESKTOP, nullptr, 0, desktopPath))) {
@@ -112,6 +113,7 @@ bool ConfigurationGUI::CreateDesktopShortcut(const std::wstring& exePath, int mo
 	psl->SetWorkingDirectory(workDir.c_str());
 	psl->SetDescription(L"Landwirtschafts-Simulator mit Bildschirmkonfiguration");
 	psl->SetIconLocation(useOriginalIcon ? exePath.c_str() : launcherPath.c_str(), 0);
+	psl->SetShowCmd(startMinimized ? SW_SHOWMINNOACTIVE : SW_NORMAL);
 
 	// Save the shortcut
 	if (FAILED(psl->QueryInterface(IID_IPersistFile, (void**)&ppf))) {
@@ -206,6 +208,10 @@ LRESULT CALLBACK ConfigurationGUI::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
 
 			hUseOriginalIconCheckbox = CreateCheckbox(hwnd, L"Originales Programmicon verwenden", MARGIN, yPos, 300, LABEL_HEIGHT + 4, hFontNormal, IDC_USE_ORIGINAL_ICON_CHECKBOX);
 			yPos += LABEL_HEIGHT + SPACING;
+			hStartMinimizedCheckbox = CreateCheckbox(hwnd, L"Minimiert starten", MARGIN, yPos, 300, LABEL_HEIGHT + 4, hFontNormal, IDC_START_MINIMIZED_CHECKBOX);
+			SendMessage(hStartMinimizedCheckbox, BM_SETCHECK, BST_CHECKED, 0);
+			yPos += LABEL_HEIGHT + SPACING;
+
 
 			// Divider line
 			CreateDivider(hwnd, MARGIN, yPos - 5, INPUT_WIDTH, 1, IDC_DIVIDER_2);
@@ -254,7 +260,8 @@ LRESULT CALLBACK ConfigurationGUI::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
 				}
 
 				bool useOriginalIcon = SendMessage(hUseOriginalIconCheckbox, BM_GETCHECK, 0, 0) == BST_CHECKED;
-				CreateDesktopShortcut(g_exePath, monitorID, useOriginalIcon);
+				bool startMinimized = SendMessage(hStartMinimizedCheckbox, BM_GETCHECK, 0, 0) == BST_CHECKED;
+				CreateDesktopShortcut(g_exePath, monitorID, useOriginalIcon, startMinimized);
 				return 0;
 			}
 			break;
@@ -314,7 +321,7 @@ void ConfigurationGUI::Show() {
 		L"Landwirtschafts-Simulator Launcher Konfiguration",
 		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		480, 350,
+		470, 410,
 		nullptr, nullptr,
 		GetModuleHandle(nullptr),
 		nullptr

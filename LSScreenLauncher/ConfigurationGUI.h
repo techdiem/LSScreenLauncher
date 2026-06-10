@@ -27,6 +27,7 @@ private:
 		IDC_CREATE_SHORTCUT_BTN = 3002,
 		IDC_REFRESH_MONITOR_ID_BTN = 3003,
 		IDC_USE_ORIGINAL_ICON_CHECKBOX = 3004,
+		IDC_START_MINIMIZED_CHECKBOX = 3005
 	};
 
 	// Layout constants
@@ -46,6 +47,7 @@ private:
 	static HWND hBrowseBtn;
 	static HWND hRefreshMonitorIDBtn;
 	static HWND hUseOriginalIconCheckbox;
+	static HWND hStartMinimizedCheckbox;
 	static std::wstring g_exePath;
 
 	// Font storage
@@ -64,6 +66,6 @@ private:
 	static void CleanupFonts();
 
 	// Action helpers
-	static bool CreateDesktopShortcut(const std::wstring& exePath, int monitorID, bool useOriginalIcon);
+	static bool CreateDesktopShortcut(const std::wstring& exePath, int monitorID, bool useOriginalIcon, bool startMinimized);
 	static std::wstring BrowseForFile();
 };
