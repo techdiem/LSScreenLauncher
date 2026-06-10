@@ -13,8 +13,8 @@ public:
 	static long SetAsPrimaryMonitor(uint32_t id);
 
 	// Start a process and wait for it to finish
-	static int StartProcessAndWait(const wchar_t* processPath);
+	static int StartProcessAndWait(const wchar_t* processPath, const wchar_t* arguments = nullptr);
 
 	// Execute the full application workflow: change monitor, start process, restore monitor
-	static int ExecuteWithMonitorSwitch(int targetMonitorID, const wchar_t* exePath, const wchar_t* workDir = nullptr);
+	static int ExecuteWithMonitorSwitch(int targetMonitorID, const wchar_t* exePath, const wchar_t* arguments = nullptr);
 };

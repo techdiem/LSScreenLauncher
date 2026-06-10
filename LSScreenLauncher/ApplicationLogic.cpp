@@ -1,5 +1,6 @@
 #include "ApplicationLogic.h"
 #include <iostream>
+#include <vector>
 
 uint32_t ApplicationLogic::GetPrimaryMonitorID() {
 	DISPLAY_DEVICE device;
@@ -71,7 +72,7 @@ long ApplicationLogic::SetAsPrimaryMonitor(uint32_t id) {
 	return setSettingsResult;
 }
 
-int ApplicationLogic::StartProcessAndWait(const wchar_t* processPath) {
+int ApplicationLogic::StartProcessAndWait(const wchar_t* processPath, const wchar_t* arguments) {
 	// Process information struct
 	PROCESS_INFORMATION processInfo;
 	ZeroMemory(&processInfo, sizeof(processInfo));
@@ -81,10 +82,21 @@ int ApplicationLogic::StartProcessAndWait(const wchar_t* processPath) {
 	ZeroMemory(&startupInfo, sizeof(startupInfo));
 	startupInfo.cb = sizeof(startupInfo);
 
+	std::wstring commandLine = L"\"";
+	commandLine += processPath;
+	commandLine += L"\"";
+	if (arguments && arguments[0] != L'\0') {
+		commandLine += L" ";
+		commandLine += arguments;
+	}
+
+	std::vector<wchar_t> mutableCommandLine(commandLine.begin(), commandLine.end());
+	mutableCommandLine.push_back(L'\0');
+
 	// Launch process
 	int procReturnCode = CreateProcess(
-		processPath, // Pfad zur ausführbaren Datei
-		nullptr,             // Befehlszeilenargumente
+		nullptr, // Anwendung über Commandline starten
+		mutableCommandLine.data(),  // Befehlszeilenargumente
 		nullptr,             // Prozess-Sicherheitsattribute
 		nullptr,             // Thread-Sicherheitsattribute
 		FALSE,               // Erben von Handles
@@ -110,7 +122,7 @@ int ApplicationLogic::StartProcessAndWait(const wchar_t* processPath) {
 }
 
 
-int ApplicationLogic::ExecuteWithMonitorSwitch(int targetMonitorID, const wchar_t* exePath, const wchar_t* workDir) {
+int ApplicationLogic::ExecuteWithMonitorSwitch(int targetMonitorID, const wchar_t* exePath, const wchar_t* arguments) {
 	// Get currently active primary monitor
 	uint32_t oldPrimaryScreen = GetPrimaryMonitorID();
 	std::wcout << "Aktuell konfigurierter Hauptbildschirm: " << oldPrimaryScreen + 1 << std::endl;
@@ -128,14 +140,12 @@ int ApplicationLogic::ExecuteWithMonitorSwitch(int targetMonitorID, const wchar_
 		return 1;
 	}
 
-	// Set working directory if provided
-	if (workDir) {
-		SetCurrentDirectory(workDir);
-	}
-
 	// Launch process
 	std::wcout << "Starte Anwendung: " << exePath << std::endl;
-	int procLaunchResult = StartProcessAndWait(exePath);
+	if (arguments && arguments[0] != L'\0') {
+		std::wcout << " mit Argumenten: " << arguments << std::endl;
+	}
+	int procLaunchResult = StartProcessAndWait(exePath, arguments);
 
 	if (procLaunchResult == 0) {
 		std::wcout << "Anwendung wurde geschlossen" << std::endl;

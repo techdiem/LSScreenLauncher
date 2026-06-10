@@ -129,11 +129,13 @@
   <ItemGroup>
     <ClCompile Include="ApplicationLogic.cpp" />
     <ClCompile Include="ConfigurationGUI.cpp" />
+    <ClCompile Include="GuiHelpers.cpp" />
     <ClCompile Include="LSScreenLauncher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationLogic.h" />
     <ClInclude Include="ConfigurationGUI.h" />
+    <ClInclude Include="GuiHelpers.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

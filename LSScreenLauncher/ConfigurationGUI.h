@@ -43,29 +43,18 @@ private:
 	static HWND hMonitorIDDisplay;
 	static HWND hMonitorIDInput;
 	static HWND hExePathInput;
+	static HWND hAppArgumentsInput;
 	static HWND hCreateShortcutBtn;
 	static HWND hBrowseBtn;
 	static HWND hRefreshMonitorIDBtn;
 	static HWND hUseOriginalIconCheckbox;
 	static HWND hStartMinimizedCheckbox;
 	static std::wstring g_exePath;
+	static std::wstring g_appArguments;
 
 	// Font storage
 	static std::map<std::wstring, HFONT> g_fonts;
 
 	// Window procedure
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	// Helper functions for GUI creation
-	static HFONT CreateUIFont(int ptSize, int weight, HDC hdc);
-	static HWND CreateLabel(HWND hParent, const std::wstring& text, int x, int y, int width, int height, HFONT hFont);
-	static HWND CreateInput(HWND hParent, const std::wstring& text, int x, int y, int width, int height, HFONT hFont, DWORD dwStyle = ES_LEFT | ES_AUTOHSCROLL);
-	static HWND CreateButton(HWND hParent, const std::wstring& text, int x, int y, int width, int height, HFONT hFont, int controlID);
-	static HWND CreateCheckbox(HWND hParent, const std::wstring& text, int x, int y, int width, int height, HFONT hFont, int controlID);
-	static HWND CreateDivider(HWND hParent, int x, int y, int width, int height, int controlID);
-	static void CleanupFonts();
-
-	// Action helpers
-	static bool CreateDesktopShortcut(const std::wstring& exePath, int monitorID, bool useOriginalIcon, bool startMinimized);
-	static std::wstring BrowseForFile();
 };
