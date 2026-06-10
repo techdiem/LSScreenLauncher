@@ -138,20 +138,6 @@ std::wstring ConfigurationGUI::BrowseForFile() {
 	OPENFILENAME ofn;
 	wchar_t szFile[MAX_PATH] = { 0 };
 
-	// Search existing Farming Simulator installation from 29 down to 13 in default directory and use the highest found version as default
-	std::wstring initialDir;
-	for (int ver = 29; ver >= 13; --ver) {
-		std::wstring candidate = L"C:\\Program Files\\Farming Simulator " + std::to_wstring(ver) + L"\\x64\\FarmingSimulator" + std::to_wstring(ver) + L"Game.exe";
-		if (GetFileAttributesW(candidate.c_str()) != INVALID_FILE_ATTRIBUTES) {
-			wcscpy_s(szFile, candidate.c_str());
-			size_t pos = candidate.find_last_of(L"\\/");
-			if (pos != std::wstring::npos) {
-				initialDir = candidate.substr(0, pos);
-			}
-			break;
-		}
-	}
-
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = hMainWindow;
@@ -161,9 +147,7 @@ std::wstring ConfigurationGUI::BrowseForFile() {
 	ofn.nFilterIndex = 1;
 	ofn.lpstrTitle = L"Pfad zur Anwendung angeben";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-	if (!initialDir.empty()) {
-		ofn.lpstrInitialDir = initialDir.c_str();
-	}
+	ofn.lpstrInitialDir = nullptr;
 
 	if (GetOpenFileName(&ofn)) {
 		return std::wstring(szFile);
