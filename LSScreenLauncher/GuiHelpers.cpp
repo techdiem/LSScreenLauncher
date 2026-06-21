@@ -66,12 +66,17 @@ bool GuiHelpers::LoadExistingShortcutConfiguration(std::wstring& exePath, std::w
 	psl->Release();
 
 	std::wstring argumentsText(arguments);
-	size_t firstSpace = argumentsText.find(L' ');
+	size_t position = 0;
+	while (position < argumentsText.size() && argumentsText[position] == L' ') {
+		++position;
+	}
+
+	size_t firstSpace = argumentsText.find(L' ', position);
 	if (firstSpace == std::wstring::npos) {
 		return false;
 	}
 
-	std::wstring monitorText = argumentsText.substr(0, firstSpace);
+	std::wstring monitorText = argumentsText.substr(position, firstSpace - position);
 	try {
 		monitorID = std::stoi(monitorText);
 	}
@@ -79,16 +84,33 @@ bool GuiHelpers::LoadExistingShortcutConfiguration(std::wstring& exePath, std::w
 		return false;
 	}
 
-	std::wstring remainingArguments = argumentsText.substr(firstSpace + 1);
-	size_t secondSpace = remainingArguments.find(L' ');
-	if (secondSpace == std::wstring::npos) {
+	position = firstSpace + 1;
+	while (position < argumentsText.size() && argumentsText[position] == L' ') {
+		++position;
+	}
+
+	if (position >= argumentsText.size() || argumentsText[position] != L'"') {
 		return false;
 	}
 
-	std::wstring exePathText = Unquote(remainingArguments.substr(0, secondSpace));
-	std::wstring appArgumentsText = Unquote(remainingArguments.substr(secondSpace + 1));
+	size_t exeEnd = argumentsText.find(L'"', position + 1);
+	if (exeEnd == std::wstring::npos) {
+		return false;
+	}
+
+	std::wstring exePathText = argumentsText.substr(position + 1, exeEnd - position - 1);
 	if (exePathText.empty()) {
 		return false;
+	}
+
+	position = exeEnd + 1;
+	while (position < argumentsText.size() && argumentsText[position] == L' ') {
+		++position;
+	}
+
+	std::wstring appArgumentsText;
+	if (position < argumentsText.size()) {
+		appArgumentsText = argumentsText.substr(position);
 	}
 
 	exePath = exePathText;
@@ -178,7 +200,7 @@ bool GuiHelpers::CreateDesktopShortcut(HWND owner, const std::wstring& exePath, 
 
 	std::wstring arguments = std::to_wstring(monitorID) + L" \"" + exePath + L"\"";
 	if (!appArguments.empty()) {
-		arguments += L" \"" + appArguments + L"\"";
+		arguments += L" " + appArguments;
 	}
 	psl->SetArguments(arguments.c_str());
 
